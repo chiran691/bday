@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Moonlight Quest</title>
+    <script src="https://pygame-web.github.io/pygbag/pygbag.js"></script>
+</head>
+<body>
+    <canvas id="pygameCanvas"></canvas>
+    <script type="text/python">
+        import pygame
+        import random
+
+        # Initialize Pygame
+        pygame.init()
+        WIDTH, HEIGHT = 800, 600
+        BG_COLOR = (10, 10, 30)
+        WHITE = (255, 255, 255)
+        PLAYER_SPEED = 5
+        ORB_COUNT = 10
+
+        # Create game window
+        screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption("Moonlight Quest")
+
+        # Load images
+        player_img = pygame.image.load("player.png")  # Add your player image
+        player_img = pygame.transform.scale(player_img, (50, 50))
+        moon_img = pygame.image.load("moon.png")  # Add a glowing moon image
+        moon_img = pygame.transform.scale(moon_img, (200, 200))
+
+        # Player and Orbs
+        player = pygame.Rect(WIDTH // 2, HEIGHT - 100, 50, 50)
+        orbs = [pygame.Rect(random.randint(50, WIDTH - 50), random.randint(50, HEIGHT - 150), 20, 20) for _ in range(ORB_COUNT)]
+        collected_orbs = 0
+        font = pygame.font.Font(None, 40)
+        clock = pygame.time.Clock()
+        running = True
+
+        while running:
+            screen.fill(BG_COLOR)
+
+            # Handle events
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+            # Player movement
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT] and player.x > 0:
+                player.x -= PLAYER_SPEED
+            if keys[pygame.K_RIGHT] and player.x < WIDTH - 50:
+                player.x += PLAYER_SPEED
+            if keys[pygame.K_UP] and player.y > 0:
+                player.y -= PLAYER_SPEED
+            if keys[pygame.K_DOWN] and player.y < HEIGHT - 50:
+                player.y += PLAYER_SPEED
+
+            # Collect orbs
+            for orb in orbs[:]:
+                if player.colliderect(orb):
+                    orbs.remove(orb)
+                    collected_orbs += 1
+
+            # Draw player
+            screen.blit(player_img, (player.x, player.y))
+
+            # Draw orbs
+            for orb in orbs:
+                pygame.draw.circle(screen, WHITE, (orb.x + 10, orb.y + 10), 10)
+
+            # Show full moon and message when all orbs are collected
+            if collected_orbs == ORB_COUNT:
+                screen.blit(moon_img, (WIDTH // 2 - 100, HEIGHT // 4))
+                message = font.render("Happy Birthday Thukpe! Love You Forever ❤️", True, WHITE)
+                screen.blit(message, (WIDTH // 2 - 250, HEIGHT // 2))
+
+            pygame.display.flip()
+            clock.tick(30)
+
+        pygame.quit()
+    </script>
+</body>
+</html>
